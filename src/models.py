@@ -47,7 +47,7 @@ class Personajes (Base):
 
 class Favoritos (Base):
     __tablename__ = "favoritos"
-    id_favoritos = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True)
     usuario_id = Column(Integer, ForeignKey('usuario.id'))
     usuario = relationship("Usuario", back_populates="favoritos")
     personaje_id = Column(Integer, ForeignKey('personajes.id'))
