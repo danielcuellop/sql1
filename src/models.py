@@ -6,54 +6,43 @@ from sqlalchemy import create_engine
 from eralchemy2 import render_er
 
 Base = declarative_base()
-
-class Usuario(Base):
-    __tablename__ = 'usuario'
+class User(Base):
+    __tablename__ = 'users'
     id = Column(Integer, primary_key=True)
-    name = Column(String(250))
-    last_name = Column(String(250))
-    mail = Column(String(100))
-    password = Column(String(20))
-    favoritos = relationship("Favoritos", back_populates="usuario")
+    username = Column(String(50), nullable=False)
+    posts = relationship("Post", back_populates="user")
+    followers = relationship("Followers", back_populates="user", cascade="all, delete-orphan")
+    following = relationship("Followers", back_populates="follower", cascade="all, delete-orphan")
+    comments = relationship("Comment", back_populates="user")
 
-class Address(Base):
-    __tablename__ = 'address'
-    id = Column(Integer, primary_key=True)
-    street_name = Column(String(250))
-    street_number = Column(String(250))
-    post_code = Column(String(250), nullable=False)
-    usuario_id = Column(Integer, ForeignKey('usuario.id'))
-    usuario = relationship("Usuario", back_populates="address")
 
-class Planetas(Base):
-    __tablename__ = "planetas"
+class Post(Base):
+    __tablename__ = 'posts'
     id = Column(Integer, primary_key=True)
-    planet_name = Column(String(100))
-    planet_population = Column(Integer)
-    planet_cost = Column(Integer)
-    planet_lenguage =Column(String(100))
-    planet_king = Column(String(100))
-    favoritos = relationship("Favoritos", back_populates="planetas")
+    caption = Column(String(200))
+    image_url = Column(String(200))
+    user_id = Column(Integer, ForeignKey('users.id'))
+    user = relationship("User", back_populates="posts")
+    comments = relationship("Comment", back_populates="post", cascade="all, delete-orphan")
 
-class Personajes (Base):
-    __tablename__ = "personajes"
-    id = Column(Integer, primary_key=True)
-    personaje_name = Column(String(100))
-    personaje_age = Column(Integer)
-    personaje_type = Column(String(100))
-    personaje_movie = Column(String(100))
-    usuario_id = Column(Integer, ForeignKey('usuario.id'))
-    favoritos = relationship("Favoritos", back_populates="personajes")
 
-class Favoritos (Base):
-    __tablename__ = "favoritos"
+class Followers(Base):
+    __tablename__ = 'followers'
+    user_id = Column(Integer, ForeignKey('users.id'), primary_key=True)
+    follower_id = Column(Integer, ForeignKey('users.id'), primary_key=True)
+    user = relationship("User", back_populates="following", foreign_keys=[user_id])
+    follower = relationship("User", back_populates="followers", foreign_keys=[follower_id])
+
+
+class Comment(Base):
+    __tablename__ = 'comments'
     id = Column(Integer, primary_key=True)
-    usuario_id = Column(Integer, ForeignKey('usuario.id'))
-    usuario = relationship("Usuario", back_populates="favoritos")
-    personaje_id = Column(Integer, ForeignKey('personajes.id'))
-    personajes = relationship("Personajes", back_populates="favoritos")
-    planetas_id = Column(Integer, ForeignKey('planetas.id'))
-    planetas = relationship("Planetas", back_populates="favoritos")
+    text = Column(String(200))
+    user_id = Column(Integer, ForeignKey('users.id'))
+    user = relationship("User", back_populates="comments")
+    post_id = Column(Integer, ForeignKey('posts.id'))
+    post = relationship("Post", back_populates="comments")
+
 
 def to_dict(self):
     return {}
