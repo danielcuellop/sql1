@@ -41,7 +41,7 @@ class Comment(Base):
     user_id = Column(Integer, ForeignKey('users.id'))
     user = relationship("User", back_populates="comments")
     post_id = Column(Integer, ForeignKey('posts.id'))
-    post = relationship("Post", back_populates="comments") 
+    post = relationship("Post", back_populates="comments")
 
 
 def to_dict(self):
